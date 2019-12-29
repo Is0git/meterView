@@ -23,12 +23,18 @@ class MeterView : View {
     var speedCircleStrokeWidthPercentage = 0.03f
     lateinit var speedCirclePaint: Paint
 
+    lateinit var textPaint: Paint
+    var speedTextGapPercentage = 0.07f
+    var speedTextStrokeWidthPercentage = 0.03f
+
     constructor(context: Context?) : super(context) {
         init()
     }
+
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         init()
     }
+
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
@@ -59,7 +65,15 @@ class MeterView : View {
             color = Color.BLACK
             isAntiAlias = true
             style = Paint.Style.STROKE
-            shader = LinearGradient(0f, 0f, 0f, 150f, Color.parseColor("#e3a43e"), Color.parseColor("#fdf291"), Shader.TileMode.MIRROR)
+            shader = LinearGradient(
+                0f,
+                0f,
+                0f,
+                150f,
+                Color.parseColor("#e3a43e"),
+                Color.parseColor("#fdf291"),
+                Shader.TileMode.MIRROR
+            )
         }
 
         speedCircle = RectF()
@@ -68,7 +82,21 @@ class MeterView : View {
             color = Color.BLACK
             isAntiAlias = true
             style = Paint.Style.STROKE
-            shader = LinearGradient(0f, 0f, 0f, 150f, Color.parseColor("#87ffe7"), Color.parseColor("#0157ff"), Shader.TileMode.MIRROR)
+            shader = LinearGradient(
+                0f,
+                0f,
+                0f,
+                150f,
+                Color.parseColor("#87ffe7"),
+                Color.parseColor("#0157ff"),
+                Shader.TileMode.MIRROR
+            )
+        }
+
+        textPaint = Paint().apply {
+            color = Color.WHITE
+            textSize = 100f
+            isAntiAlias = true
         }
     }
 
@@ -84,7 +112,13 @@ class MeterView : View {
 
         }
         speedCirclePaint.strokeWidth = canvas.height * speedCircleStrokeWidthPercentage
-        canvas.drawArc(speedCircle, speedCircleStartAngle, speedCircleSweepAngle, false, speedCirclePaint )
+        canvas.drawArc(
+            speedCircle,
+            speedCircleStartAngle,
+            speedCircleSweepAngle,
+            false,
+            speedCirclePaint
+        )
     }
 
     private fun drawKwIndicator(canvas: Canvas?) {
@@ -98,12 +132,19 @@ class MeterView : View {
 
         }
         kwCirclePaint.strokeWidth = canvas.height * kwCircleStrokeWidthPercentage
-        canvas.drawArc(kwCircle, kwCircleStartAngle, kwCircleSweepAngle, false, kwCirclePaint )
+        canvas.drawArc(kwCircle, kwCircleStartAngle, kwCircleSweepAngle, false, kwCirclePaint)
+    }
+
+    private fun drawSpeed(speed: String = "00", canvas: Canvas?) {
+        val startY = canvas?.height!!/2f +25f
+        val startX = canvas.width/2 - textPaint.measureText(speed, 0, speed.length)/2f
+        canvas.drawText(speed, 0, speed.length, startX, startY, textPaint)
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-      drawKwIndicator(canvas)
+        drawKwIndicator(canvas)
         drawSpeedIndicator(canvas)
+        drawSpeed(canvas = canvas)
     }
 }
