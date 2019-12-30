@@ -8,6 +8,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 
 class MeterView : View {
+    lateinit var kwPath: Path
     lateinit var kwCircle: RectF
     var kwCircleGapPercentage = 0.10f
     var kwCircleStartAngle = 90f
@@ -15,7 +16,7 @@ class MeterView : View {
     var kwCircleStrokeWidthPercentage = 0.008f
     lateinit var kwCirclePaint: Paint
 
-
+    lateinit var speedPath: Path
     lateinit var speedCircle: RectF
     var speedCircleStartAngle = 0f
     var speedCircleSweepAngle = 360f
@@ -98,6 +99,8 @@ class MeterView : View {
             textSize = 100f
             isAntiAlias = true
         }
+        kwPath = Path()
+        speedPath = Path()
     }
 
 
@@ -111,14 +114,13 @@ class MeterView : View {
             right = canvas.width - widthGap
 
         }
+        speedPath.addArc(speedCircle, speedCircleStartAngle, speedCircleSweepAngle)
+        speedCirclePaint.maskFilter = BlurMaskFilter(20f, BlurMaskFilter.Blur.SOLID)
         speedCirclePaint.strokeWidth = canvas.height * speedCircleStrokeWidthPercentage
-        canvas.drawArc(
-            speedCircle,
-            speedCircleStartAngle,
-            speedCircleSweepAngle,
-            false,
-            speedCirclePaint
-        )
+        canvas.drawPath(speedPath,speedCirclePaint)
+
+
+
     }
 
     private fun drawKwIndicator(canvas: Canvas?) {
@@ -131,8 +133,15 @@ class MeterView : View {
             right = canvas.width - widthGap
 
         }
+//
         kwCirclePaint.strokeWidth = canvas.height * kwCircleStrokeWidthPercentage
-        canvas.drawArc(kwCircle, kwCircleStartAngle, kwCircleSweepAngle, false, kwCirclePaint)
+        kwPath.apply {
+            addArc(kwCircle, kwCircleStartAngle, kwCircleSweepAngle)
+        }
+        kwCirclePaint.maskFilter = BlurMaskFilter(widthGap, BlurMaskFilter.Blur.SOLID)
+        canvas.drawPath(kwPath, kwCirclePaint)
+
+
     }
 
     private fun drawSpeed(speed: String = "00", canvas: Canvas?) {
