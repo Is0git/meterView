@@ -19,7 +19,7 @@ class MeterView : View {
     lateinit var speedPath: Path
     lateinit var speedCircle: RectF
     var speedCircleStartAngle = 0f
-    var speedCircleSweepAngle = 360f
+    var speedCircleSweepAngle = 150f
     var speedCircleGapPercentage = 0.07f
     var speedCircleStrokeWidthPercentage = 0.03f
     lateinit var speedCirclePaint: Paint
@@ -27,6 +27,10 @@ class MeterView : View {
     lateinit var textPaint: Paint
     var speedTextGapPercentage = 0.07f
     var speedTextStrokeWidthPercentage = 0.03f
+
+    lateinit var tickPath: Path
+    lateinit var pathPaint: Paint
+    var tickCount = 36
 
     constructor(context: Context?) : super(context) {
         init()
@@ -87,7 +91,7 @@ class MeterView : View {
                 0f,
                 0f,
                 0f,
-                150f,
+                500f,
                 Color.parseColor("#87ffe7"),
                 Color.parseColor("#0157ff"),
                 Shader.TileMode.MIRROR
@@ -101,6 +105,14 @@ class MeterView : View {
         }
         kwPath = Path()
         speedPath = Path()
+
+        tickPath = Path()
+        pathPaint = Paint().apply {
+            style = Paint.Style.STROKE
+            color = Color.RED
+            strokeWidth = 10f
+        }
+
     }
 
 
@@ -115,12 +127,8 @@ class MeterView : View {
 
         }
         speedPath.addArc(speedCircle, speedCircleStartAngle, speedCircleSweepAngle)
-        speedCirclePaint.maskFilter = BlurMaskFilter(20f, BlurMaskFilter.Blur.SOLID)
         speedCirclePaint.strokeWidth = canvas.height * speedCircleStrokeWidthPercentage
-        canvas.drawPath(speedPath,speedCirclePaint)
-
-
-
+        canvas.drawPath(speedPath, speedCirclePaint)
     }
 
     private fun drawKwIndicator(canvas: Canvas?) {
@@ -138,21 +146,43 @@ class MeterView : View {
         kwPath.apply {
             addArc(kwCircle, kwCircleStartAngle, kwCircleSweepAngle)
         }
-        kwCirclePaint.maskFilter = BlurMaskFilter(widthGap, BlurMaskFilter.Blur.SOLID)
+        kwCirclePaint.maskFilter = BlurMaskFilter(40f, BlurMaskFilter.Blur.SOLID)
         canvas.drawPath(kwPath, kwCirclePaint)
 
 
     }
 
     private fun drawSpeed(speed: String = "00", canvas: Canvas?) {
-        val startY = canvas?.height!!/2f +25f
-        val startX = canvas.width/2 - textPaint.measureText(speed, 0, speed.length)/2f
+        val startY = canvas?.height!! / 2f + 25f
+        val startX = canvas.width / 2 - textPaint.measureText(speed, 0, speed.length) / 2f
         canvas.drawText(speed, 0, speed.length, startX, startY, textPaint)
+    }
+
+    private fun drawSpeedTicks(canvas: Canvas?) {
+        val tickStartX = canvas?.width!! * (kwCircleGapPercentage + kwCircleStrokeWidthPercentage)
+        val tickEndX =
+            canvas.width * (kwCircleGapPercentage + kwCircleStrokeWidthPercentage + speedCircleGapPercentage)
+        val ticksStep = 360 / tickCount
+
+        canvas.save()
+        for (b in 0 until 360 step ticksStep) {
+            tickPath.apply {
+                moveTo(tickStartX, 150f)
+                lineTo(tickEndX, 150f)
+
+                canvas.rotate(b.toFloat())
+            }
+            canvas.drawPath(tickPath, pathPaint)
+        }
+
+        canvas.restore()
+
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         drawKwIndicator(canvas)
+        drawSpeedTicks(canvas)
         drawSpeedIndicator(canvas)
         drawSpeed(canvas = canvas)
     }

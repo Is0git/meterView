@@ -7,8 +7,8 @@
     tools:context=".MainActivity">
 
     <com.android.meterview.MeterView
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_width="415dp"
+        android:layout_height="415dp"
         android:text="Hello World!"
         android:background="#1f1f2b"
         app:layout_constraintBottom_toBottomOf="parent"
